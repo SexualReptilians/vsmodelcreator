@@ -7,15 +7,16 @@ import at.vintagestory.modelcreator.util.Parser;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.function.Consumer;
 
 public class LabeledSliderComponent extends JPanel {
 
-    private DecimalFormat decimalFormat = new DecimalFormat("##.#");
+    final private DecimalFormat decimalFormat = new DecimalFormat("#0.0");
+
+    private double value;
 
     final private SpringLayout layout;
     final private JPanel panel;
@@ -101,36 +102,37 @@ public class LabeledSliderComponent extends JPanel {
 
         add(panel);
 
-        onSliderValueChanged(null);
+        setValue(this.posDefault);
     }
 
     private void onSliderValueChanged(ChangeEvent e) {
+        if (!this.slider.getValueIsAdjusting()) return;
+        // do stuff only when slider is grabbed
+
+        double step = (double)this.slider.getMajorTickSpacing() / multiplier;
+        double align = this.posDefault % step;
+
+        double val = (double)this.slider.getValue() / multiplier;
+        val = step * Math.round((val - align) / step) + align;
+        this.setValue(val, true);
+
         this.slider.setSnapToTicks(true);
-
-        ModelCreator.ignoreValueUpdates = true;
-
-        double value = ((double)this.slider.getValue() / multiplier);
-        //value = Math.round( value / ((float)this.tickSpacing / multiplier) ) * ((float)this.tickSpacing / multiplier);
-        this.textField.setText(String.format("%s", decimalFormat.format(value)));
-        if (valueChangedCallback != null) {
-            valueChangedCallback.accept((double)(this.slider.getValue()) / multiplier);
-        }
-
-        ModelCreator.ignoreValueUpdates = false;
     }
 
     private void onTextFieldValueChanged(ChangeEvent e) {
-        double val = Parser.parseDouble(this.textField.getText(), this.slider.getValue()/multiplier);
-
-        this.slider.setSnapToTicks(false);
-        this.slider.setValue((int)(val*multiplier));
+        try {
+            double val = Double.parseDouble(this.textField.getText().replace(',', '.'));
+            this.setValue(val);
+        } catch (NumberFormatException ex) {
+            Toolkit.getDefaultToolkit().beep();
+        }
     }
 
     private void onMouseWheelTextField(MouseWheelEvent e) {
         if (!this.isEnabled()) return;
-        this.slider.setSnapToTicks(false);
+
         float size = e.getWheelRotation() * ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
-        this.slider.setValue(this.slider.getValue() + (int)(size * multiplier));
+        this.setValue( this.value + size, true );
     }
 
     public void onValueChanged(Consumer<Double> callback) {
@@ -138,8 +140,26 @@ public class LabeledSliderComponent extends JPanel {
     }
 
     public void setValue(double value) {
+        setValue(value, false);
+    }
+
+    public void setValue(double value, boolean forced) {
+        if (value == this.value && !forced) return;
+        ModelCreator.ignoreValueUpdates = true;
+
         this.slider.setSnapToTicks(false);
         this.slider.setValue((int)(value * multiplier));
+        if (!this.textField.isFocusOwner() || forced) {
+            // update textField only if not focused (unless forced)
+            this.textField.setText(decimalFormat.format(value));
+        }
+
+        if (valueChangedCallback != null && value != this.value) {
+            valueChangedCallback.accept(value);
+        }
+
+        this.value = value;
+        ModelCreator.ignoreValueUpdates = false;
     }
 
     @Override
@@ -148,7 +168,7 @@ public class LabeledSliderComponent extends JPanel {
         this.slider.setEnabled(enabled);
         this.textField.setEnabled(enabled);
         if (!enabled) {
-            this.setValue(this.posDefault);
+            this.setValue(this.posDefault, true);
         }
     }
 
