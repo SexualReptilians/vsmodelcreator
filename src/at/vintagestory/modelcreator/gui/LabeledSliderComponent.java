@@ -14,23 +14,27 @@ import java.util.function.Consumer;
 
 public class LabeledSliderComponent extends JPanel {
 
-    final private DecimalFormat decimalFormat = new DecimalFormat("#0.0");
-
-    private double value;
+    final private DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
     final private SpringLayout layout;
     final private JPanel panel;
     final private JTextField textField;
     final private JSlider slider;
+
     private Consumer<Double> valueChangedCallback;
 
     final private String label;
     final private Color color;
+
+    private int multiplier;
+
+    private double value;
     private int rangeMin;
     private int rangeMax;
     private int posDefault;
     private int tickSpacing;
-    private int multiplier;
+    private double sliderStep;
+    private double sliderStepAlign;
 
     public LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, int tickSpacing) {
         this(label, color, rangeMin, rangeMax, posDefault, tickSpacing, 1);
@@ -56,12 +60,12 @@ public class LabeledSliderComponent extends JPanel {
         this.posDefault = posDefault * this.multiplier;
         this.tickSpacing = (int)(tickSpacing * this.multiplier);
 
+        // Setup panel
         this.layout = new SpringLayout();
         this.panel = new JPanel(this.layout);
 
         // Setup text field
         this.textField = new JTextField();
-
         this.textField.setPreferredSize(new Dimension(42, 20));
         this.textField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.textField.setHorizontalAlignment(JTextField.RIGHT);
@@ -73,24 +77,28 @@ public class LabeledSliderComponent extends JPanel {
         this.slider.setMajorTickSpacing(this.tickSpacing);
         this.slider.setPaintTicks(true);
         this.slider.setPaintLabels(true);
+        this.singlePrecisionSnapping(false);
 
-        // Dynamically setup labels
+        // Dynamically setup slider labels
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-        labelTable.put(this.rangeMin, new JLabel(String.format("%d°", (this.rangeMin / this.multiplier))));
-        labelTable.put((this.rangeMin + this.rangeMax) / 2, new JLabel(String.format("%d°", ((this.rangeMin + this.rangeMax) / 2 / this.multiplier))));
-        labelTable.put(this.rangeMax, new JLabel(String.format("%d°", (this.rangeMax / this.multiplier))));
+        labelTable.put(this.rangeMin, new JLabel(String.format("%d", (this.rangeMin / this.multiplier))));
+        labelTable.put((this.rangeMin + this.rangeMax) / 2, new JLabel(String.format("%d", ((this.rangeMin + this.rangeMax) / 2 / this.multiplier))));
+        labelTable.put(this.rangeMax, new JLabel(String.format("%d", (this.rangeMax / this.multiplier))));
         this.slider.setLabelTable(labelTable);
 
         // TODO dynamic preferred size
         this.slider.setPreferredSize(new Dimension(160, 40));
 
+        // Add event listeners
         this.slider.addChangeListener(this::onSliderValueChanged);
         AwtUtil.addChangeListener(this.textField, this::onTextFieldValueChanged);
         this.textField.addMouseWheelListener(this::onMouseWheelTextField);
 
+        // Put elements in panel
         this.panel.add(textField);
         this.panel.add(slider);
 
+        // Setup panel layout
         this.layout.putConstraint(SpringLayout.WEST, this.textField, 0, SpringLayout.WEST, this.panel);
         this.layout.putConstraint(SpringLayout.NORTH, this.textField, 0, SpringLayout.NORTH, this.panel);
 
@@ -100,23 +108,24 @@ public class LabeledSliderComponent extends JPanel {
         this.layout.putConstraint(SpringLayout.EAST, this.panel, 0, SpringLayout.EAST, this.slider);
         this.layout.putConstraint(SpringLayout.SOUTH, this.panel, 0, SpringLayout.SOUTH, this.slider);
 
-        add(panel);
+        super.add(panel);
 
-        setValue(this.posDefault);
+        // set initial default value
+        setValue(this.posDefault, true);
     }
 
     private void onSliderValueChanged(ChangeEvent e) {
-        if (!this.slider.getValueIsAdjusting()) return;
         // do stuff only when slider is grabbed
+        if (!this.slider.getValueIsAdjusting()) return;
 
-        double step = (double)this.slider.getMajorTickSpacing() / multiplier;
-        double align = this.posDefault % step;
-
-        double val = (double)this.slider.getValue() / multiplier;
-        val = step * Math.round((val - align) / step) + align;
-        this.setValue(val, true);
-
+        // If we're manipulating the slider, snap to ticks
         this.slider.setSnapToTicks(true);
+
+        // Snap directly to ticks without intermediate values
+        double val = (double)this.slider.getValue() / this.multiplier;
+        val = this.sliderStep * Math.round((val - this.sliderStepAlign) / this.sliderStep) + this.sliderStepAlign;
+
+        this.setValue(val, true);
     }
 
     private void onTextFieldValueChanged(ChangeEvent e) {
@@ -132,7 +141,7 @@ public class LabeledSliderComponent extends JPanel {
         if (!this.isEnabled()) return;
 
         float size = e.getWheelRotation() * ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
-        this.setValue( this.value + size, true );
+        this.setValue(this.value + size, true);
     }
 
     public void onValueChanged(Consumer<Double> callback) {
@@ -149,8 +158,9 @@ public class LabeledSliderComponent extends JPanel {
 
         this.slider.setSnapToTicks(false);
         this.slider.setValue((int)(value * multiplier));
+
+        // update textField only if not focused (unless forced)
         if (!this.textField.isFocusOwner() || forced) {
-            // update textField only if not focused (unless forced)
             this.textField.setText(decimalFormat.format(value));
         }
 
@@ -181,5 +191,8 @@ public class LabeledSliderComponent extends JPanel {
             this.slider.setMajorTickSpacing(this.tickSpacing);
             this.slider.setPaintTicks(true);
         }
+
+        this.sliderStep = (double)this.slider.getMajorTickSpacing() / this.multiplier;
+        this.sliderStepAlign = this.posDefault % this.sliderStep;
     }
 }
