@@ -154,7 +154,6 @@ public class LabeledSliderComponent extends JPanel {
 
     public void setValue(double value, boolean forced) {
         if (value == this.value && !forced) return;
-        ModelCreator.ignoreValueUpdates = true;
 
         this.slider.setSnapToTicks(false);
         this.slider.setValue((int)(value * multiplier));
@@ -164,12 +163,13 @@ public class LabeledSliderComponent extends JPanel {
             this.textField.setText(decimalFormat.format(value));
         }
 
-        if (valueChangedCallback != null && value != this.value) {
+        if (valueChangedCallback != null && value != this.value && !ModelCreator.ignoreValueUpdates) {
+            ModelCreator.ignoreValueUpdates = true;
             valueChangedCallback.accept(value);
+            ModelCreator.ignoreValueUpdates = false;
         }
 
         this.value = value;
-        ModelCreator.ignoreValueUpdates = false;
     }
 
     @Override
