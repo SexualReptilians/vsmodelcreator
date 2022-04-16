@@ -2,7 +2,6 @@ package at.vintagestory.modelcreator.gui;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.util.AwtUtil;
-import at.vintagestory.modelcreator.util.Parser;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -35,6 +34,7 @@ public class LabeledSliderComponent extends JPanel {
     private int tickSpacing;
     private double sliderStep;
     private double sliderStepAlign;
+    private boolean flashing = false;
 
     public LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, int tickSpacing) {
         this(label, color, rangeMin, rangeMax, posDefault, tickSpacing, 1);
@@ -129,17 +129,21 @@ public class LabeledSliderComponent extends JPanel {
     }
 
     private void onTextFieldValueChanged(ChangeEvent e) {
+        // Set valid values else reject and notify
         try {
             double val = Double.parseDouble(this.textField.getText().replace(',', '.'));
             this.setValue(val);
         } catch (NumberFormatException ex) {
+            flashTextField();
             Toolkit.getDefaultToolkit().beep();
         }
     }
 
     private void onMouseWheelTextField(MouseWheelEvent e) {
+        // Ignore wheel events when element disabled
         if (!this.isEnabled()) return;
 
+        // Multiplier for holding shift
         float size = e.getWheelRotation() * ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
         this.setValue(this.value + size, true);
     }
@@ -153,8 +157,10 @@ public class LabeledSliderComponent extends JPanel {
     }
 
     public void setValue(double value, boolean forced) {
+        // Dont recursively repeat events
         if (value == this.value && !forced) return;
 
+        // stop slider tick snapping (for some reason it snaps to ticks even if set programmatically)
         this.slider.setSnapToTicks(false);
         this.slider.setValue((int)(value * multiplier));
 
@@ -163,6 +169,7 @@ public class LabeledSliderComponent extends JPanel {
             this.textField.setText(decimalFormat.format(value));
         }
 
+        // Call the callback function
         if (valueChangedCallback != null && value != this.value && !ModelCreator.ignoreValueUpdates) {
             ModelCreator.ignoreValueUpdates = true;
             valueChangedCallback.accept(value);
@@ -174,6 +181,7 @@ public class LabeledSliderComponent extends JPanel {
 
     @Override
     public void setEnabled(boolean enabled) {
+        // Enable or disable the element
         super.setEnabled(enabled);
         this.slider.setEnabled(enabled);
         this.textField.setEnabled(enabled);
@@ -183,6 +191,7 @@ public class LabeledSliderComponent extends JPanel {
     }
 
     public void singlePrecisionSnapping(boolean enabled) {
+        // allow moving sliders in 1s integers
         if (enabled) {
             this.slider.setMajorTickSpacing(multiplier);
             this.slider.setPaintTicks(false);
@@ -192,7 +201,42 @@ public class LabeledSliderComponent extends JPanel {
             this.slider.setPaintTicks(true);
         }
 
+        // fix steps
         this.sliderStep = (double)this.slider.getMajorTickSpacing() / this.multiplier;
         this.sliderStepAlign = this.posDefault % this.sliderStep;
+    }
+
+    private void flashTextField() {
+        // dont flash if flashing
+        if (this.flashing) return;
+        this.flashing = true;
+
+        // parameters for flashing
+        Color originalColor = this.textField.getForeground();
+        Color newColor = new Color(255 - originalColor.getRed(), 255 - originalColor.getGreen(), 255 - originalColor.getBlue());
+        int flashDelay = 75;
+        int flashLength = 500;
+        int totalCount = flashLength / flashDelay;
+
+        // Flash timer
+        javax.swing.Timer timer = new javax.swing.Timer(flashDelay, new ActionListener(){
+            int count = 0;
+            public void actionPerformed(ActionEvent evt) {
+                // Every odd number change color
+                if (count % 2 == 0) {
+                    textField.setForeground(newColor);
+                } else {
+                    textField.setForeground(originalColor);
+                    // once done flashing stop timer
+                    if (count >= totalCount) {
+                        ((Timer)evt.getSource()).stop();
+                        flashing = false;
+                    }
+                }
+                count++;
+            }
+        });
+
+        timer.start();
     }
 }
