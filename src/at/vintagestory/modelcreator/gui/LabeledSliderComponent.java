@@ -2,6 +2,7 @@ package at.vintagestory.modelcreator.gui;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.util.AwtUtil;
+import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -19,10 +20,10 @@ public class LabeledSliderComponent extends JPanel {
     final private JPanel panel;
     final private JTextField textField;
     final private JSlider slider;
+    final private JLabel label;
 
     private Consumer<Double> valueChangedCallback;
 
-    final private String label;
     final private Color color;
 
     private int multiplier;
@@ -52,7 +53,6 @@ public class LabeledSliderComponent extends JPanel {
 
     private LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, double tickSpacing, int multiplier) {
         // Initial variables
-        this.label = label;
         this.color = color;
         this.multiplier = multiplier;
         this.rangeMin = rangeMin * this.multiplier;
@@ -63,6 +63,10 @@ public class LabeledSliderComponent extends JPanel {
         // Setup panel
         this.layout = new SpringLayout();
         this.panel = new JPanel(this.layout);
+
+        // Setup label
+        this.label = new JLabel(label);
+        this.label.setPreferredSize(new Dimension(42, 20));
 
         // Setup text field
         this.textField = new JTextField();
@@ -80,10 +84,15 @@ public class LabeledSliderComponent extends JPanel {
         this.singlePrecisionSnapping(false);
 
         // Dynamically setup slider labels
+        Font sliderLabelFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         labelTable.put(this.rangeMin, new JLabel(String.format("%d", (this.rangeMin / this.multiplier))));
         labelTable.put((this.rangeMin + this.rangeMax) / 2, new JLabel(String.format("%d", ((this.rangeMin + this.rangeMax) / 2 / this.multiplier))));
         labelTable.put(this.rangeMax, new JLabel(String.format("%d", (this.rangeMax / this.multiplier))));
+        // Set the font
+        labelTable.forEach((k, v) -> {
+            v.setFont(sliderLabelFont);
+        });
         this.slider.setLabelTable(labelTable);
 
         // TODO dynamic preferred size
@@ -93,12 +102,16 @@ public class LabeledSliderComponent extends JPanel {
         this.slider.addChangeListener(this::onSliderValueChanged);
         AwtUtil.addChangeListener(this.textField, this::onTextFieldValueChanged);
         this.textField.addMouseWheelListener(this::onMouseWheelTextField);
-
+        
         // Put elements in panel
-        this.panel.add(textField);
-        this.panel.add(slider);
+        this.panel.add(this.label);
+        this.panel.add(this.textField);
+        this.panel.add(this.slider);
 
         // Setup panel layout
+        this.layout.putConstraint(SpringLayout.WEST, this.label, 0, SpringLayout.WEST, this.panel);
+        this.layout.putConstraint(SpringLayout.NORTH, this.label, 20, SpringLayout.NORTH, this.panel);
+
         this.layout.putConstraint(SpringLayout.WEST, this.textField, 0, SpringLayout.WEST, this.panel);
         this.layout.putConstraint(SpringLayout.NORTH, this.textField, 0, SpringLayout.NORTH, this.panel);
 

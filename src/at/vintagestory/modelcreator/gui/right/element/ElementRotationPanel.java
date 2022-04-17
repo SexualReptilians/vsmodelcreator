@@ -39,14 +39,14 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		slidersPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html>&nbsp;&nbsp;&nbsp;<b>XYZ Rotation</b></html>"));
 
 
-		x = new LabeledSliderComponent("X", Color.RED, -180, 180, 0, 22.5);
-		y = new LabeledSliderComponent("Y", Color.GREEN, -180, 180, 0, 22.5);
-		z = new LabeledSliderComponent("Z", Color.BLUE, -180, 180, 0, 22.5);
+		x = new LabeledSliderComponent("X", new Color(0xFFB3B3, false), -180, 180, 0, 22.5);
+		y = new LabeledSliderComponent("Y", new Color(0xBBFFB3, false), -180, 180, 0, 22.5);
+		z = new LabeledSliderComponent("Z", new Color(0xB3C1FF, false), -180, 180, 0, 22.5);
 
 
-		qx = new LabeledSliderComponent("QX", Color.RED, -1, 1, 0, 0.1);
-		qy = new LabeledSliderComponent("QY", Color.GREEN, -1, 1, 0, 0.1);
-		qz = new LabeledSliderComponent("QZ", Color.BLUE, -1, 1, 0, 0.1);
+		qx = new LabeledSliderComponent("QX", new Color(0xFFB3B3, false), -1, 1, 0, 0.1);
+		qy = new LabeledSliderComponent("QY", new Color(0xBBFFB3, false), -1, 1, 0, 0.1);
+		qz = new LabeledSliderComponent("QZ", new Color(0xB3C1FF, false), -1, 1, 0, 0.1);
 		qw = new LabeledSliderComponent("QW", Color.GRAY, -1, 1, 0, 0.1);
 
 		slidersPanel.add(x);
