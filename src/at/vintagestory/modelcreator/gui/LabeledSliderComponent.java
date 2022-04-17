@@ -2,6 +2,7 @@ package at.vintagestory.modelcreator.gui;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.util.AwtUtil;
+import com.formdev.flatlaf.FlatClientProperties;
 import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 
 import javax.swing.*;
@@ -66,12 +67,12 @@ public class LabeledSliderComponent extends JPanel {
 
         // Setup label
         this.label = new JLabel(label);
-        this.label.setPreferredSize(new Dimension(42, 20));
+        this.label.setPreferredSize(new Dimension(47, 20));
 
         // Setup text field
         this.textField = new JTextField();
-        this.textField.setPreferredSize(new Dimension(42, 20));
-        this.textField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        this.textField.setPreferredSize(new Dimension(47, 20));
+        //this.textField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.textField.setHorizontalAlignment(JTextField.RIGHT);
         this.textField.setForeground(Color.BLACK);
         this.textField.setBackground(this.color);
@@ -96,13 +97,13 @@ public class LabeledSliderComponent extends JPanel {
         this.slider.setLabelTable(labelTable);
 
         // TODO dynamic preferred size
-        this.slider.setPreferredSize(new Dimension(160, 40));
+        this.slider.setPreferredSize(new Dimension(155, 40));
 
         // Add event listeners
         this.slider.addChangeListener(this::onSliderValueChanged);
         AwtUtil.addChangeListener(this.textField, this::onTextFieldValueChanged);
         this.textField.addMouseWheelListener(this::onMouseWheelTextField);
-        
+
         // Put elements in panel
         this.panel.add(this.label);
         this.panel.add(this.textField);

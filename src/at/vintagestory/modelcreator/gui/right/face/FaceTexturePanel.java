@@ -45,8 +45,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	{
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 14);
 
-		btnSelect = new JButton("Image");
-		btnSelect.setIcon(Icons.texture);
+		btnSelect = new JButton(Icons.texture);
 		btnSelect.addActionListener(e ->
 		{
 			if (manager.getCurrentElement() != null)
@@ -63,8 +62,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnSelect.setFont(defaultFont);
 		btnSelect.setToolTipText("Opens the Texture Manager");
 
-		btnClear = new JButton("Clear");
-		btnClear.setIcon(Icons.clear);
+		btnClear = new JButton(Icons.clear);
 		btnClear.addActionListener(e ->
 		{
 			if (manager.getCurrentElement() != null)
@@ -85,8 +83,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnClear.setFont(defaultFont);
 		btnClear.setToolTipText("<html>Clears the texture from this face.<br><b>Hold shift to clear all faces</b></html>");
 
-		btnCopy = new JButton("Copy");
-		btnCopy.setIcon(Icons.copy);
+		btnCopy = new JButton(Icons.copy);
 		btnCopy.addActionListener(e ->
 		{
 			if (manager.getCurrentElement() != null)
@@ -98,8 +95,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnCopy.setFont(defaultFont);
 		btnCopy.setToolTipText("Copies the texture on this face to clipboard");
 
-		btnPaste = new JButton("Paste");
-		btnPaste.setIcon(Icons.clipboard);
+		btnPaste = new JButton(Icons.clipboard);
 		btnPaste.addActionListener(e ->
 		{
 			ClipboardTexture texture = Clipboard.getTexture();

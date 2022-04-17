@@ -28,6 +28,7 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.EnumEntityActivityStoppedHandling;
 import at.vintagestory.modelcreator.enums.EnumEntityAnimationEndHandling;
+import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Animation;
 
@@ -123,10 +124,7 @@ public class AnimationSelector
 		JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
 		buttonPanel.setPreferredSize(new Dimension(233, 30));
 		
-		
-		
-		
-		JButton btnSelect = new JButton("New");
+		JButton btnSelect = new JButton(Icons.add);
 		btnSelect.addActionListener(a ->
 		{
 			Project project = ModelCreator.currentProject;
@@ -152,7 +150,7 @@ public class AnimationSelector
 
 		
 		
-		JButton btnImport = new JButton("Delete");
+		JButton btnImport = new JButton(Icons.bin);
 		btnImport.addActionListener(a ->
 		{
 			Project project = ModelCreator.currentProject;
@@ -186,15 +184,6 @@ public class AnimationSelector
 		
 		btnImport.setFont(defaultFont);
 		buttonPanel.add(btnImport);
-
-		JButton btnClose = new JButton("Close");
-		btnClose.addActionListener(a ->
-		{
-			SwingUtilities.getWindowAncestor(btnClose).dispose();
-		});
-		btnClose.setFont(defaultFont);
-		buttonPanel.add(btnClose);
-
 		
 		dialog = new JDialog(ModelCreator.Instance, "List of Animations", false);
 		dialog.setLayout(new GridLayout(1, 2, 10, 10));
@@ -222,7 +211,7 @@ public class AnimationSelector
 				
 		dialog.setResizable(false);
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-		dialog.setPreferredSize(new Dimension(480, 394));
+		dialog.setPreferredSize(new Dimension(490, 410));
 		
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
@@ -317,7 +306,6 @@ public class AnimationSelector
 		
 		layout.putConstraint(SpringLayout.WEST, animEndedList, 0, SpringLayout.WEST, label);
 		layout.putConstraint(SpringLayout.NORTH, animEndedList, 0, SpringLayout.SOUTH, label);
-
 		
 		rightPanel.add(new JLabel(""));
 		
@@ -340,9 +328,6 @@ public class AnimationSelector
 		
 		return model;
 	}
-	
-
-
 
 	private DefaultComboBoxModel<String> activityStoppedList()
 	{
@@ -355,7 +340,6 @@ public class AnimationSelector
 		return model;
 	}
 
-
 	private DefaultComboBoxModel<String> animationEndList()
 	{
 		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
@@ -366,7 +350,6 @@ public class AnimationSelector
 		
 		return model;
 	}
-	
 	
 	public void updateValues() {
 		ignoreSelectionChange = true;
@@ -389,7 +372,6 @@ public class AnimationSelector
 		
 		ignoreSelectionChange = false;
 	}
-
 	
 	public static void display(IElementManager manager)
 	{
@@ -397,14 +379,9 @@ public class AnimationSelector
 		selector.show();
 	}
 
-	
-	
 	private void show()
 	{
 		dialog.setVisible(true);
 		
 	}
-
-
-		
 }

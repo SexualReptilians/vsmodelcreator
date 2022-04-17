@@ -136,7 +136,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
 			ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 			ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
-			
+
 			ModelCreator.ignoreValueUpdates = true;
 			updateValues(tabbedPane);
 			ModelCreator.ignoreValueUpdates = false;
@@ -148,9 +148,12 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	public void setLayout(int dy)
 	{
 		layout = new SpringLayout();
-		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70 + dy, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70 + dy, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70 + dy, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, scrollPane, 10, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, btnContainer, 10, SpringLayout.SOUTH, scrollPane);
+		layout.putConstraint(SpringLayout.NORTH, nameField, 10, SpringLayout.SOUTH, btnContainer);
+		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 10, SpringLayout.SOUTH, nameField);
+		layout.putConstraint(SpringLayout.SOUTH, this, 10, SpringLayout.SOUTH, tabbedPane);
+
 		setLayout(layout);
 	}
 
