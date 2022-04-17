@@ -172,10 +172,10 @@ public class GuiMenu extends JMenuBar
 			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
 			
 
-			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
+			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A);
 			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 			
-			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
+			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
 			
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
@@ -186,22 +186,22 @@ public class GuiMenu extends JMenuBar
 		
 		menuView = new JMenu("View");
 		{
-			itemGrid = createCheckboxItem("Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
+			itemGrid = createCheckboxItem("Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G);
 			itemGrid.setSelected(ModelCreator.showGrid);
 			
-			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
+			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y);
 			itemTransparency.setSelected(ModelCreator.transparent);
 			
-			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
+			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T);
 			itemTexture.setSelected(ModelCreator.transparent);
 
-			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
+			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D);
 			itemDarkMode.setSelected(ModelCreator.darkMode);
 			
-			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
+			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D);
 			itemSaratyMode.setSelected(ModelCreator.saratyMode);
 			
-			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
+			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D);
 			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
 			
 			itemPreviewWind = new JMenu("Wind preview");
@@ -600,7 +600,6 @@ public class GuiMenu extends JMenuBar
 		key = "Show Textxure";
 		itemTexture.setAction(buttonAction3);
 		buttonAction3.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
-		itemTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/transparent.png")));
 		itemTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[6], key);
 		itemTexture.getActionMap().put(key, buttonAction3);
 		itemTexture.setAccelerator(strokes[6]);
@@ -977,8 +976,14 @@ public class GuiMenu extends JMenuBar
 		item.setIcon(icon);
 		return item;
 	}
-	
-	
+
+	private JCheckBoxMenuItem createCheckboxItem(String name, String tooltip, int mnemonic)
+	{
+		JCheckBoxMenuItem item = new JCheckBoxMenuItem(name);
+		item.setToolTipText(tooltip);
+		item.setMnemonic(mnemonic);
+		return item;
+	}
 	
 
 

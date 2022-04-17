@@ -10,19 +10,11 @@ import java.awt.event.MouseMotionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.BlockFacing;
-import at.vintagestory.modelcreator.gui.ComponentUtil;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
@@ -38,9 +30,9 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	private IElementManager manager;
 
 	private JPanel horizontalBox;
-	private JRadioButton boxEnabled;
-	private JRadioButton boxAutoUV;
-	private JRadioButton boxSnapUv;
+	private JCheckBox boxEnabled;
+	private JCheckBox boxAutoUV;
+	private JCheckBox boxSnapUv;
 	private JTextField glowValue;
 	private JTextField windData;
 	
@@ -61,8 +53,9 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	public void initComponents()
 	{
 		horizontalBox = new JPanel(new GridLayout(0, 1));
-		
-		boxEnabled = ComponentUtil.createRadioButton("Enabled","<html>Determines if face should be rendered<br>Default: On</html>");
+
+		boxEnabled = new JCheckBox("Enabled");
+		boxEnabled.setToolTipText("Determines if face should be rendered\nDefault: On");
 		boxEnabled.addActionListener(e ->
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
@@ -80,8 +73,9 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 			
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
-		
-		boxAutoUV = ComponentUtil.createRadioButton("Auto Resolution", "<html>Automatically sets the UV end coordinates to fit the desired texture resolution<br>Default: On</html>");
+
+		boxAutoUV = new JCheckBox("Auto Resolution");
+		boxAutoUV.setToolTipText("Automatically sets the UV end coordinates to fit the desired texture resolution\nDefault: On");
 		boxAutoUV.addActionListener(e ->
 		{
 			boolean on = boxAutoUV.isSelected();
@@ -105,8 +99,8 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
 		
-		
-		boxSnapUv = ComponentUtil.createRadioButton("Snap UV", "<html>Determines if auto-uv should snap the coordinates to pixels on the texture. Disable if your element is very small or want full control over the UV Coordinates<br>Default: On</html>");
+		boxSnapUv = new JCheckBox("Snap UV");
+		boxSnapUv.setToolTipText("Determines if auto-uv should snap the coordinates to pixels on the texture. Disable if your element is very small or want full control over the UV Coordinates\nDefault: On");
 		boxSnapUv.addActionListener(e ->
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
