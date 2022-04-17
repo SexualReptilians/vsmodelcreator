@@ -55,7 +55,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 		this.manager = manager;
 		setLayout(new GridLayout(3, 4, 4, 4));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Face UV</b></html>"));
-		setMaximumSize(new Dimension(186, 124));
+		setMaximumSize(new Dimension(205, 124));
 		initComponents();
 		initProperties();
 		addComponents();

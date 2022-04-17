@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
@@ -51,7 +52,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 11);
 		
 
-		btnRot = new JToggleButton("Rotation");
+		btnRot = new JToggleButton(Icons.rotate);
+		btnRot.setToolTipText("Rotation keyframe");
 		btnRot.setFont(defaultFont);
 		btnRot.addActionListener(a ->
 		{
@@ -77,7 +79,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnContainer.add(btnRot);
 		
 		
-		btnPos = new JToggleButton("Position");
+		btnPos = new JToggleButton(Icons.move);
+		btnPos.setToolTipText("Position keyframe");
 		btnPos.setFont(defaultFont);
 		btnPos.addActionListener(a ->
 		{
@@ -105,7 +108,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		
 		
-		btnStretch = new JToggleButton("Stretch");
+		btnStretch = new JToggleButton(Icons.stretch);
+		btnStretch.setToolTipText("Stretch keyframe");
 		btnStretch.setFont(defaultFont);
 		btnStretch.addActionListener(a ->
 		{

@@ -9,7 +9,6 @@ public class Icons
 	public static Icon add_rollover;
 	public static Icon bin;
 	public static Icon bin_open;
-	public static Icon remove_rollover;
 	public static Icon new_;
 	public static Icon import_;
 	public static Icon export;
@@ -29,8 +28,6 @@ public class Icons
 	public static Icon smallcube;
 	public static Icon smallcubegray;
 	public static Icon point;
-	public static Icon light_on;
-	public static Icon light_off;
 	public static Icon arrow_up;
 	public static Icon arrow_down;
 	public static Icon arrow_join;
@@ -67,6 +64,9 @@ public class Icons
 	public static Icon addremove;
 	public static Icon left;
 	public static Icon right;
+	public static Icon move;
+	public static Icon rotate;
+	public static Icon stretch;
 	
 	public static Icon weather_snow;
 
@@ -126,6 +126,10 @@ public class Icons
 		
 		left = new ImageIcon(loader.getResource("icons/move_left.png"));
 		right = new ImageIcon(loader.getResource("icons/move_right.png"));
+
+		move = new ImageIcon(loader.getResource("icons/move.png"));
+		rotate = new ImageIcon(loader.getResource("icons/rotate.png"));
+		stretch = new ImageIcon(loader.getResource("icons/stretch.png"));
 		
 		addremove = new ImageIcon(loader.getResource("icons/addremove.png"));
 		
