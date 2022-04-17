@@ -5,24 +5,14 @@ import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
-import at.vintagestory.modelcreator.gui.ComponentUtil;
 import at.vintagestory.modelcreator.gui.StepparentSelectionDialog;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 {
@@ -30,7 +20,8 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 
 	private IElementManager manager;
 
-	private JRadioButton btnShade;
+	//private JRadioButton btnShade;
+	private JCheckBox btnShade;
 	
 	JTextField climateColorMapField;
 	JTextField seasonColorMapField;
@@ -53,7 +44,8 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		btnShade = ComponentUtil.createRadioButton("Shade", "<html>Determines if shadows should be rendered<br>Default: On</html>");
+		btnShade = new JCheckBox("Shade");
+		btnShade.setToolTipText("Determines if shadows should be rendered\nDefault: On");
 		btnShade.addActionListener(e ->
 		{
 			Element elem2 = manager.getCurrentElement();

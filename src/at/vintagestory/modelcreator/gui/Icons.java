@@ -103,9 +103,6 @@ public class Icons
 		keyboard = new ImageIcon(loader.getResource("icons/keyboard.png"));
 		drink = new ImageIcon(loader.getResource("icons/drink.png"));
 		
-		light_on = new ImageIcon(loader.getResource("icons/box_off.png"));
-		light_off = new ImageIcon(loader.getResource("icons/box_on.png"));
-		
 		arrow_up = new ImageIcon(loader.getResource("icons/arrow_up.png"));
 		arrow_down = new ImageIcon(loader.getResource("icons/arrow_down.png"));
 		arrow_join = new ImageIcon(loader.getResource("icons/arrow_join.png"));
