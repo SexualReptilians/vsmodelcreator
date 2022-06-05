@@ -91,8 +91,24 @@ public class QUtil
 
         return angles;
     }
-    
-    
+
+    // yaw pitch roll (zyx) but better and complementary to ToQuaternion
+    public static double[] ToEulerAngles2(Quaternion q) {
+        q = q.normalise(null);
+
+        double sqw = q.w * q.w;
+        double sqx = q.x * q.x;
+        double sqy = q.y * q.y;
+        double sqz = q.z * q.z;
+
+        double eul[] = new double[3];
+
+        eul[2] = Math.atan2(2 * (q.y*q.z + q.w*q.x), sqw-sqx-sqy+sqz);
+        eul[1] = Math.asin(-2 * (q.x*q.z - q.w*q.y));
+        eul[0] = Math.atan2(2 * (q.x*q.y + q.w*q.z), sqw+sqx-sqy-sqz);
+        return eul;
+    }
+
     public static double[] MatrixToEuler(float[] matrix) {
         Quaternion q = new Quaternion();
         Matrix4f mat = new Matrix4f();

@@ -15,7 +15,7 @@ import org.lwjgl.util.vector.Quaternion;
 
 public class ElementRotationPanel extends JPanel implements IValueUpdater
 {
-	private IElementManager manager;
+	private final IElementManager manager;
 
 	LabeledSliderComponent x;
 	LabeledSliderComponent y;
@@ -44,10 +44,10 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		z = new LabeledSliderComponent("Z", Color.BLUE, -180, 180, 0, 22.5);
 
 
-		qx = new LabeledSliderComponent("QX", Color.RED, -1, 1, 0, 0.1);
-		qy = new LabeledSliderComponent("QY", Color.GREEN, -1, 1, 0, 0.1);
-		qz = new LabeledSliderComponent("QZ", Color.BLUE, -1, 1, 0, 0.1);
-		qw = new LabeledSliderComponent("QW", Color.GRAY, -1, 1, 0, 0.1);
+		qx = new LabeledSliderComponent("QX", Color.RED, -1, 1, 0, 0.01, 100);
+		qy = new LabeledSliderComponent("QY", Color.GREEN, -1, 1, 0, 0.01, 100);
+		qz = new LabeledSliderComponent("QZ", Color.BLUE, -1, 1, 0, 0.01, 100);
+		qw = new LabeledSliderComponent("QW", Color.GRAY, -1, 1, 0, 0.01, 100);
 
 		slidersPanel.add(x);
 		slidersPanel.add(y);
@@ -80,8 +80,10 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private void rotQX(double value) {
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
-			quaternion.setX((float) value);
+			double[] norm = normalizeOthers(value, quaternion.y, quaternion.z, quaternion.w);
+			quaternion.set((float)value, (float)norm[0], (float)norm[1], (float)norm[2]);
 			updateQuat(cube);
+			updateQuatSliders(cube);
 			updateEulerSliders(cube);
 		}
 	}
@@ -89,8 +91,10 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private void rotQY(double value) {
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
-			quaternion.setY((float) value);
+			double[] norm = normalizeOthers(value, quaternion.x, quaternion.z, quaternion.w);
+			quaternion.set((float)norm[0], (float)value, (float)norm[1], (float)norm[2]);
 			updateQuat(cube);
+			updateQuatSliders(cube);
 			updateEulerSliders(cube);
 		}
 	}
@@ -98,8 +102,10 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private void rotQZ(double value) {
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
-			quaternion.setZ((float) value);
+			double[] norm = normalizeOthers(value, quaternion.x, quaternion.y, quaternion.w);
+			quaternion.set((float)norm[0], (float)norm[1], (float)value, (float)norm[2]);
 			updateQuat(cube);
+			updateQuatSliders(cube);
 			updateEulerSliders(cube);
 		}
 	}
@@ -107,8 +113,10 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private void rotQW(double value) {
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
-			quaternion.setW((float) value);
+			double[] norm = normalizeOthers(value, quaternion.x, quaternion.y, quaternion.z);
+			quaternion.set((float)norm[0], (float)norm[1], (float)norm[2], (float)value);
 			updateQuat(cube);
+			updateQuatSliders(cube);
 			updateEulerSliders(cube);
 		}
 	}
@@ -117,6 +125,11 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
 			cube.setRotationX(value);
+			quaternion = QUtil.ToQuaternion(
+					Math.toRadians(cube.getRotationZ()),
+					Math.toRadians(cube.getRotationY()),
+					Math.toRadians(cube.getRotationX())
+			);
 			updateQuatSliders(cube);
 		}
 	}
@@ -125,6 +138,11 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
 			cube.setRotationY(value);
+			quaternion = QUtil.ToQuaternion(
+					Math.toRadians(cube.getRotationZ()),
+					Math.toRadians(cube.getRotationY()),
+					Math.toRadians(cube.getRotationX())
+			);
 			updateQuatSliders(cube);
 		}
 	}
@@ -133,14 +151,36 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
 			cube.setRotationZ(value);
+			quaternion = QUtil.ToQuaternion(
+					Math.toRadians(cube.getRotationZ()),
+					Math.toRadians(cube.getRotationY()),
+					Math.toRadians(cube.getRotationX())
+			);
 			updateQuatSliders(cube);
 		}
 	}
 
+	private double[] normalizeOthers(double constant, double v1, double v2, double v3) {
+		double c = Math.sqrt(1 - Math.min(Math.pow(constant, 2), 1));
+		// length of v1, v2, v3
+		double len = Math.sqrt(Math.pow(v1, 2) + Math.pow(v2, 2) + Math.pow(v3, 2));
+		if (len == 0) {
+			v1 = 1;
+			v2 = 1;
+			v3 = 1;
+			len = 1;
+		}
+
+		return new double[]{
+				c * v1/len,
+				c * v2/len,
+				c * v3/len,
+		};
+	}
 
 	// quat slider values to cube rotation
 	private void updateQuat(Element cube) {
-		double[] euler = QUtil.ToEulerAngles(quaternion);
+		double[] euler = QUtil.ToEulerAngles2(quaternion);
 		cube.setRotationX(Math.toDegrees(euler[2]));
 		cube.setRotationY(Math.toDegrees(euler[1]));
 		cube.setRotationZ(Math.toDegrees(euler[0]));
@@ -148,11 +188,6 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 
 	// cube rotation to quat sliders
 	private void updateQuatSliders(Element cube) {
-		quaternion = QUtil.ToQuaternion(
-				Math.toRadians(cube.getRotationZ()),
-				Math.toRadians(cube.getRotationY()),
-				Math.toRadians(cube.getRotationX())
-		);
 		this.qx.setValue(quaternion.getX());
 		this.qy.setValue(quaternion.getY());
 		this.qz.setValue(quaternion.getZ());
