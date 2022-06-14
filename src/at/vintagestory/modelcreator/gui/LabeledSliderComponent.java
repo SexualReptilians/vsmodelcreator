@@ -79,7 +79,8 @@ public class LabeledSliderComponent extends JPanel {
         // Setup slider
         this.slider = new JSlider(JSlider.HORIZONTAL, this.rangeMin, this.rangeMax, this.posDefault);
         this.slider.setMajorTickSpacing(this.tickSpacing);
-        this.slider.setPaintTicks(true);
+        // TODO make this dynamic along with size
+        this.slider.setPaintTicks(this.multiplier<50);
         this.slider.setPaintLabels(true);
         this.singlePrecisionSnapping(false);
 
@@ -149,6 +150,7 @@ public class LabeledSliderComponent extends JPanel {
                 this.setValue(val);
             } catch (NumberFormatException ex) {
                 Toolkit.getDefaultToolkit().beep();
+                this.flashTextField();
             }
         }
     }
@@ -212,7 +214,8 @@ public class LabeledSliderComponent extends JPanel {
         }
         else {
             this.slider.setMajorTickSpacing(this.tickSpacing);
-            this.slider.setPaintTicks(true);
+            // TODO set this dynamically with size
+            this.slider.setPaintTicks(this.multiplier<50);
         }
 
         // fix steps
