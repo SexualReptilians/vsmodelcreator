@@ -53,7 +53,6 @@ public class LabeledSliderComponent extends JPanel {
 
     public LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, double tickSpacing, int multiplier) {
         // Initial variables
-        this.label = label;
         this.color = color;
         this.multiplier = multiplier;
         this.rangeMin = rangeMin * this.multiplier;
