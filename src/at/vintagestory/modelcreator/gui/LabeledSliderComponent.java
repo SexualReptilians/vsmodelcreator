@@ -51,8 +51,9 @@ public class LabeledSliderComponent extends JPanel {
 
     }
 
-    private LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, double tickSpacing, int multiplier) {
+    public LabeledSliderComponent(String label, Color color, int rangeMin, int rangeMax, int posDefault, double tickSpacing, int multiplier) {
         // Initial variables
+        this.label = label;
         this.color = color;
         this.multiplier = multiplier;
         this.rangeMin = rangeMin * this.multiplier;
@@ -142,13 +143,14 @@ public class LabeledSliderComponent extends JPanel {
     }
 
     private void onTextFieldValueChanged(ChangeEvent e) {
-        // Set valid values else reject and notify
-        try {
-            double val = Double.parseDouble(this.textField.getText().replace(',', '.'));
-            this.setValue(val);
-        } catch (NumberFormatException ex) {
-            flashTextField();
-            Toolkit.getDefaultToolkit().beep();
+        // update internal value only if box is focused
+        if (this.textField.isFocusOwner()) {
+            try {
+                double val = Double.parseDouble(this.textField.getText().replace(',', '.'));
+                this.setValue(val);
+            } catch (NumberFormatException ex) {
+                Toolkit.getDefaultToolkit().beep();
+            }
         }
     }
 
