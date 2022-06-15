@@ -10,6 +10,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.QUtil;
+import at.vintagestory.modelcreator.util.QUtil.QuaternionAxis;
 import at.vintagestory.modelcreator.util.SpringUtilities;
 import org.lwjgl.util.vector.Quaternion;
 
@@ -28,6 +29,11 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 
 	Quaternion quaternion;
 
+	QuaternionAxis lastQuaternionChanged = QuaternionAxis.None;
+	QuaternionAxis lastValidQuaternionChanged = QuaternionAxis.None;
+	boolean lastQuaternionWasNegative = false;
+	boolean lastValidQuaternionWasNegative = false;
+
 	public ElementRotationPanel(IElementManager manager)
 	{
 		this.manager = manager;
@@ -38,34 +44,31 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 
 		slidersPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html>&nbsp;&nbsp;&nbsp;<b>XYZ Rotation</b></html>"));
 
+		this.quaternion = new Quaternion();
 
-		x = new LabeledSliderComponent("X", new Color(0xFFB3B3, false), -180, 180, 0, 22.5);
-		y = new LabeledSliderComponent("Y", new Color(0xBBFFB3, false), -180, 180, 0, 22.5);
-		z = new LabeledSliderComponent("Z", new Color(0xB3C1FF, false), -180, 180, 0, 22.5);
+		this.x = new LabeledSliderComponent("X", new Color(0xFFB3B3, false), -180, 180, 0, 22.5);
+		this.y = new LabeledSliderComponent("Y", new Color(0xBBFFB3, false), -180, 180, 0, 22.5);
+		this.z = new LabeledSliderComponent("Z", new Color(0xB3C1FF, false), -180, 180, 0, 22.5);
+		this.qx = new LabeledSliderComponent("QX", new Color(0xFFB3B3, false), -1, 1, 0, 0.01, 100);
+		this.qy = new LabeledSliderComponent("QY", new Color(0xBBFFB3, false), -1, 1, 0, 0.01, 100);
+		this.qz = new LabeledSliderComponent("QZ", new Color(0xB3C1FF, false), -1, 1, 0, 0.01, 100);
+		this.qw = new LabeledSliderComponent("QW", Color.GRAY, -1, 1, 0, 0.01, 100);
 
-		qx = new LabeledSliderComponent("QX", new Color(0xFFB3B3, false), -1, 1, 0, 0.01, 100);
-		qy = new LabeledSliderComponent("QY", new Color(0xBBFFB3, false), -1, 1, 0, 0.01, 100);
-		qz = new LabeledSliderComponent("QZ", new Color(0xB3C1FF, false), -1, 1, 0, 0.01, 100);
-		qw = new LabeledSliderComponent("QW", Color.GRAY, -1, 1, 0, 0.01, 100);
+		slidersPanel.add(this.x);
+		slidersPanel.add(this.y);
+		slidersPanel.add(this.z);
+		slidersPanel.add(this.qx);
+		slidersPanel.add(this.qy);
+		slidersPanel.add(this.qz);
+		slidersPanel.add(this.qw);
 
-		slidersPanel.add(x);
-		slidersPanel.add(y);
-		slidersPanel.add(z);
-
-		quaternion = new Quaternion();
-		slidersPanel.add(qx);
-		slidersPanel.add(qy);
-		slidersPanel.add(qz);
-		slidersPanel.add(qw);
-
-		x.onValueChanged(this::rotX);
-		y.onValueChanged(this::rotY);
-		z.onValueChanged(this::rotZ);
-
-		qx.onValueChanged(this::rotQX);
-		qy.onValueChanged(this::rotQY);
-		qz.onValueChanged(this::rotQZ);
-		qw.onValueChanged(this::rotQW);
+		this.x.onValueChanged(this::rotX);
+		this.y.onValueChanged(this::rotY);
+		this.z.onValueChanged(this::rotZ);
+		this.qx.onValueChanged(v -> this.rotQ(v, QuaternionAxis.X));
+		this.qy.onValueChanged(v -> this.rotQ(v, QuaternionAxis.Y));
+		this.qz.onValueChanged(v -> this.rotQ(v, QuaternionAxis.Z));
+		this.qw.onValueChanged(v -> this.rotQ(v, QuaternionAxis.W));
 
 		layout.putConstraint(SpringLayout.EAST, slidersPanel, 5, SpringLayout.EAST, z);
 		layout.putConstraint(SpringLayout.SOUTH, slidersPanel, 5, SpringLayout.SOUTH, z);
@@ -76,46 +79,24 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		add(slidersPanel);
 	}
 
-	private void rotQX(double value) {
+	private void rotQ(double value, QuaternionAxis axis) {
 		Element cube = manager.getCurrentElement();
 		if (cube != null) {
-			double[] norm = normalizeOthers(value, quaternion.y, quaternion.z, quaternion.w);
-			quaternion.set((float)value, (float)norm[0], (float)norm[1], (float)norm[2]);
+			if (lastQuaternionChanged != axis) {
+				lastValidQuaternionChanged = lastQuaternionChanged;
+				lastValidQuaternionWasNegative = lastQuaternionWasNegative;
+			}
+			lastQuaternionChanged = axis;
+			lastQuaternionWasNegative = value < 0;
+			System.out.println("---");
+			System.out.println(quaternion);
+			QUtil.setQuaternionComponent(quaternion, axis, (float) value);
+			System.out.println(quaternion);
+			Quaternion norm = QUtil.normalizeOthers(quaternion, axis, lastValidQuaternionChanged, lastValidQuaternionWasNegative);
+			quaternion.set(norm);
+			System.out.println(quaternion);
 			updateQuat(cube);
-			updateQuatSliders(cube);
-			updateEulerSliders(cube);
-		}
-	}
-
-	private void rotQY(double value) {
-		Element cube = manager.getCurrentElement();
-		if (cube != null) {
-			double[] norm = normalizeOthers(value, quaternion.x, quaternion.z, quaternion.w);
-			quaternion.set((float)norm[0], (float)value, (float)norm[1], (float)norm[2]);
-			updateQuat(cube);
-			updateQuatSliders(cube);
-			updateEulerSliders(cube);
-		}
-	}
-
-	private void rotQZ(double value) {
-		Element cube = manager.getCurrentElement();
-		if (cube != null) {
-			double[] norm = normalizeOthers(value, quaternion.x, quaternion.y, quaternion.w);
-			quaternion.set((float)norm[0], (float)norm[1], (float)value, (float)norm[2]);
-			updateQuat(cube);
-			updateQuatSliders(cube);
-			updateEulerSliders(cube);
-		}
-	}
-
-	private void rotQW(double value) {
-		Element cube = manager.getCurrentElement();
-		if (cube != null) {
-			double[] norm = normalizeOthers(value, quaternion.x, quaternion.y, quaternion.z);
-			quaternion.set((float)norm[0], (float)norm[1], (float)norm[2], (float)value);
-			updateQuat(cube);
-			updateQuatSliders(cube);
+			updateQuatSliders();
 			updateEulerSliders(cube);
 		}
 	}
@@ -129,7 +110,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 					Math.toRadians(cube.getRotationY()),
 					Math.toRadians(cube.getRotationX())
 			);
-			updateQuatSliders(cube);
+			updateQuatSliders();
 		}
 	}
 
@@ -142,7 +123,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 					Math.toRadians(cube.getRotationY()),
 					Math.toRadians(cube.getRotationX())
 			);
-			updateQuatSliders(cube);
+			updateQuatSliders();
 		}
 	}
 
@@ -155,26 +136,8 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 					Math.toRadians(cube.getRotationY()),
 					Math.toRadians(cube.getRotationX())
 			);
-			updateQuatSliders(cube);
+			updateQuatSliders();
 		}
-	}
-
-	private double[] normalizeOthers(double constant, double v1, double v2, double v3) {
-		double c = Math.sqrt(1 - Math.min(Math.pow(constant, 2), 1));
-		// length of v1, v2, v3
-		double len = Math.sqrt(Math.pow(v1, 2) + Math.pow(v2, 2) + Math.pow(v3, 2));
-		if (len == 0) {
-			v1 = 1;
-			v2 = 1;
-			v3 = 1;
-			len = 1;
-		}
-
-		return new double[]{
-				c * v1/len,
-				c * v2/len,
-				c * v3/len,
-		};
 	}
 
 	// quat slider values to cube rotation
@@ -186,7 +149,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	}
 
 	// cube rotation to quat sliders
-	private void updateQuatSliders(Element cube) {
+	private void updateQuatSliders() {
 		this.qx.setValue(quaternion.getX());
 		this.qy.setValue(quaternion.getY());
 		this.qz.setValue(quaternion.getZ());
@@ -215,8 +178,8 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			this.qz.setEnabled(true);
 			this.qw.setEnabled(true);
 
+			updateQuatSliders();
 			updateEulerSliders(cube);
-			updateQuatSliders(cube);
 		}
 		else {
 			this.x.setEnabled(false);
@@ -227,6 +190,9 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			this.qy.setEnabled(false);
 			this.qz.setEnabled(false);
 			this.qw.setEnabled(false);
+
+			lastQuaternionChanged = QuaternionAxis.None;
+			lastValidQuaternionChanged = QuaternionAxis.None;
 		}
 
 		this.x.singlePrecisionSnapping(ModelCreator.currentProject.AllAngles);

@@ -201,4 +201,90 @@ public class QUtil
         Quaternion q = IntrinsicXYZToQuaternion(alpha, beta, gamma);
         return ToAxisAngle(axis, q);
     }
+
+
+    public enum QuaternionAxis { None, W, X, Y, Z }
+
+    public static float getQuaternionComponent(Quaternion q, QuaternionAxis component) {
+        switch (component) {
+            case X: return q.x;
+            case Y: return q.y;
+            case Z: return q.z;
+            case W: return q.w;
+            default: throw new IllegalArgumentException("Component is not a valid quaternion component.");
+        }
+    }
+
+    public static void setQuaternionComponent(Quaternion q, QuaternionAxis component, float value) {
+        switch (component) {
+            case X: q.x = value; break;
+            case Y: q.y = value; break;
+            case Z: q.z = value; break;
+            case W: q.w = value; break;
+            default: throw new IllegalArgumentException("Component is not a valid quaternion component.");
+        }
+    }
+
+    public static Quaternion normalizeOthers(Quaternion q, QuaternionAxis constant) {
+        return normalizeOthers(q, constant, QuaternionAxis.None);
+    }
+
+    public static Quaternion normalizeOthers(Quaternion q, QuaternionAxis constant, QuaternionAxis modifyPreference) {
+        return normalizeOthers(q, constant, QuaternionAxis.None, false);
+    }
+
+    public static Quaternion normalizeOthers(Quaternion q, QuaternionAxis constant, QuaternionAxis modifyPreference, boolean negativePreference) {
+        // clone the quaternion passed
+        q = new Quaternion(q);
+        // c = sqrt(1 - clamp0to1(const^2))
+        float constVal = getQuaternionComponent(q, constant);
+        double c = Math.sqrt(1 - Math.min(Math.pow(constVal, 2), 1));
+        double mag = Math.abs(q.x) + Math.abs(q.y) + Math.abs(q.z) + Math.abs(q.w);
+
+        if (mag == 0) {
+            return q.setIdentity();
+        } else if (constant == QuaternionAxis.None) {
+            return q.normalise(q);
+        } else if (modifyPreference == constant) {
+            return q;
+        }
+
+        float v1, v2, v3;
+        // Are other values than the constant zeroes?
+        if (mag - Math.abs(constVal) == 0) {
+            float u = negativePreference ? -1 : 1;
+            switch (modifyPreference) {
+                case X: q.set(u, 0, 0, 0); break;
+                case Y: q.set(0, u, 0, 0); break;
+                case Z: q.set(0, 0, u, 0); break;
+                case W: q.set(0, 0, 0, u); break;
+                case None: q.set(u, u, u, u); break;
+            }
+            // restore constant
+            setQuaternionComponent(q, constant, constVal);
+        }
+
+        // anonymize the other values
+        switch (constant) {
+            case X: v1 = q.y; v2 = q.z; v3 = q.w; break;
+            case Y: v1 = q.x; v2 = q.z; v3 = q.w; break;
+            case Z: v1 = q.x; v2 = q.y; v3 = q.w; break;
+            case W: v1 = q.x; v2 = q.y; v3 = q.z; break;
+            default: return null;   // impossible
+        }
+
+        // length of v1, v2, v3
+        double len = Math.sqrt(Math.pow(v1, 2) + Math.pow(v2, 2) + Math.pow(v3, 2));
+        v1 = (float)(c * v1/len);
+        v2 = (float)(c * v2/len);
+        v3 = (float)(c * v3/len);
+
+        switch (constant) {
+            case X: return new Quaternion(q.x, v1, v2, v3);
+            case Y: return new Quaternion(v1, q.y, v2, v3);
+            case Z: return new Quaternion(v1, v2, q.z, v3);
+            case W: return new Quaternion(v1, v2, v3, q.w);
+            default: return null;   // again, impossible
+        }
+    }
 }
