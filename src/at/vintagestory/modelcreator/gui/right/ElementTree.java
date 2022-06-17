@@ -55,15 +55,15 @@ public class ElementTree
 			@Override
 			public void valueChanged(TreeSelectionEvent e)
 			{
-				
+
 				if (!ModelCreator.ignoreValueUpdates) {
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
 					if (ModelCreator.currentProject.SelectedElement != null) {
 						ModelCreator.currentProject.SelectedElement.elementWasSelected();
 					}
-					ModelCreator.updateValues(jtree);	
+					ModelCreator.updateValues(jtree);
 				}
-			}	
+			}
 		});
 		
 		// does not work, wtf?
@@ -145,14 +145,13 @@ public class ElementTree
 				
 				if (path != null && pathLeft == null) {
 					
-					Object userObj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(); 
+					Object userObj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
 		        	if (userObj instanceof Element) {
 		        		((Element)userObj).setRenderInEditor(!((Element)userObj).getRenderInEditor());
-		        		jtree.updateUI();
-		        		arg0.consume();
+						jtree.repaint();
+						arg0.consume();
 		        	}
 				}
-				
 			}
 			
 			@Override

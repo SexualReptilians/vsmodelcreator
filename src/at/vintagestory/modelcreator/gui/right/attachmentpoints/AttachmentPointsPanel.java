@@ -6,16 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
@@ -31,6 +22,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 	SpringLayout layout;
 	
 	JList<AttachmentPoint> pointList;
+	JScrollPane pointScrollList;
 	JPanel btnContainer;
 	JButton btnAdd = new JButton();
 	JButton btnRemove = new JButton();
@@ -77,8 +69,10 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		pointList.setModel(pointListModel);
 		pointList.setVisible(true);
 		pointList.setCellRenderer(new AttachmentPointCellRenderer());
-		
-		pointList.setPreferredSize(new Dimension(195, 100));
+
+		pointScrollList = new JScrollPane(pointList);
+		pointScrollList.setPreferredSize(new Dimension(195, 100));
+
 		pointList.addListSelectionListener(e -> {
 			ModelCreator.currentProject.SelectedAttachmentPoint = pointList.getSelectedValue();
 			updateValues(pointList);
@@ -154,7 +148,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 
 	public void setLayoutConstaints()
 	{
-		layout.putConstraint(SpringLayout.NORTH, pointList, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, pointScrollList, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, btnContainer, 105, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, codeField, 140, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, posPanel, 190, SpringLayout.NORTH, this);
@@ -163,7 +157,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 	
 	public void addComponents()
 	{
-		add(pointList);
+		add(pointScrollList);
 		add(btnContainer);
 		add(codeField);
 		add(posPanel);

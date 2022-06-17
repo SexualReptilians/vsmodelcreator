@@ -9,21 +9,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import at.vintagestory.modelcreator.ModelCreator;
@@ -36,6 +22,9 @@ import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 
@@ -168,7 +157,7 @@ public class GuiMenu extends JMenuBar
 
 		menuProject = new JMenu("Project");
 		{
-			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0, Icons.reload);
+			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0);
 			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
 			
 

@@ -50,6 +50,9 @@ public class Start
 		try
 		{
 			FlatDarkLaf.setup();
+			//UIManager.put("TabbedPane.tabWidthMode", "equal");
+			UIManager.put("TabbedPane.minimumTabWidth", 80);
+			UIManager.put("TabbedPane.showTabSeparators", true);
 		}
 		catch (Exception e)
 		{

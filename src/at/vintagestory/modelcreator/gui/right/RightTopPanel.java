@@ -117,7 +117,8 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		tabbedPane.add("Cube", new ElementPanel(this));
 		tabbedPane.add("Face", new FacePanel(this));
 		tabbedPane.add("Keyframe", rightKeyFramesPanel = new RightKeyFramesPanel());
-		tabbedPane.add("P", new AttachmentPointsPanel());
+		tabbedPane.add("Attachment Point", new AttachmentPointsPanel());
+		tabbedPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
 		
 		tabbedPane.setPreferredSize(new Dimension(205, 1150));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
@@ -143,6 +144,8 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		});
 		
 		add(tabbedPane);
+
+		tabbedPane.setPreferredSize(new Dimension(205, 1150));
 	}
 
 	public void setLayout(int dy)

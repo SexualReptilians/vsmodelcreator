@@ -18,11 +18,11 @@ public class ElementTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		super.getTreeCellRendererComponent(tree, value, selected,expanded, leaf, row, hasFocus);
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-        
+
         if (tree.getModel().getRoot().equals(node)) {
             setIcon(null);
         } else {
-			Object userObj = node.getUserObject(); 
+			Object userObj = node.getUserObject();
         	if (userObj instanceof Element) {
         		if(((Element)userObj).getRenderInEditor()) {
         			setIcon(Icons.smallcube);
@@ -30,8 +30,6 @@ public class ElementTreeCellRenderer extends DefaultTreeCellRenderer
         			setIcon(Icons.smallcubegray);
         		}
         	}
-
-            
         }
         
         return this;
