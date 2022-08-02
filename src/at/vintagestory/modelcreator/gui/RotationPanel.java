@@ -11,27 +11,26 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class RotationPanel extends JPanel implements IValueUpdater {
-    private final LabeledSliderComponent x;
-    private final LabeledSliderComponent y;
-    private final LabeledSliderComponent z;
-    private final LabeledSliderComponent qx;
-    private final LabeledSliderComponent qy;
-    private final LabeledSliderComponent qz;
-    private final LabeledSliderComponent qw;
+    protected final LabeledSliderComponent x;
+    protected final LabeledSliderComponent y;
+    protected final LabeledSliderComponent z;
+    protected final LabeledSliderComponent qx;
+    protected final LabeledSliderComponent qy;
+    protected final LabeledSliderComponent qz;
+    protected final LabeledSliderComponent qw;
 
-    private final Quaternion quaternion;
+    protected final Quaternion quaternion;
 
-    private QUtil.QuaternionAxis lastQuaternionChanged = QUtil.QuaternionAxis.None;
-    private QUtil.QuaternionAxis lastValidQuaternionChanged = QUtil.QuaternionAxis.None;
+    protected QUtil.QuaternionAxis lastQuaternionChanged = QUtil.QuaternionAxis.None;
+    protected QUtil.QuaternionAxis lastValidQuaternionChanged = QUtil.QuaternionAxis.None;
     private boolean lastQuaternionWasNegative = false;
     private boolean lastValidQuaternionWasNegative = false;
-    JPanel slidersPanel;
 
     public RotationPanel() {
         setMaximumSize(new Dimension(186, 270));
 
         SpringLayout layout = new SpringLayout();
-        slidersPanel = new JPanel(layout);
+        JPanel slidersPanel = new JPanel(layout);
 
         slidersPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html>&nbsp;&nbsp;&nbsp;<b>XYZ Rotation</b></html>"));
 
@@ -76,25 +75,26 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
     protected abstract void setElementRotation(double x, double y, double z);
 
     private void rotQ(double value, QUtil.QuaternionAxis axis) {
-        double[] rot = getElementRotation();
-        if (rot != null) {
-            if (lastQuaternionChanged != axis) {
-                lastValidQuaternionChanged = lastQuaternionChanged;
-                lastValidQuaternionWasNegative = lastQuaternionWasNegative;
-            }
-            lastQuaternionChanged = axis;
-            lastQuaternionWasNegative = value < 0;
-            QUtil.setQuaternionComponent(quaternion, axis, (float) value);
-            quaternion.set(QUtil.normalizeOthers(quaternion, axis, lastValidQuaternionChanged, lastValidQuaternionWasNegative));
+        double[] rot = this.getElementRotation();
+        if (rot == null) return;
 
-            updateQuat();
-            updateQuatSliders();
-            updateEulerSliders();
+        if (lastQuaternionChanged != axis) {
+            lastValidQuaternionChanged = lastQuaternionChanged;
+            lastValidQuaternionWasNegative = lastQuaternionWasNegative;
         }
+        lastQuaternionChanged = axis;
+        lastQuaternionWasNegative = value < 0;
+        QUtil.setQuaternionComponent(quaternion, axis, (float) value);
+        quaternion.set(QUtil.normalizeOthers(quaternion, axis, lastValidQuaternionChanged, lastValidQuaternionWasNegative));
+
+        updateQuat();
+        updateEulerSliders();
     }
 
     private void rotX(double value) {
         double[] rot = this.getElementRotation();
+        if (rot == null) return;
+
         this.setElementRotation(value, rot[1], rot[2]);
         quaternion.set(QUtil.ToQuaternion(
                 Math.toRadians(rot[2]), // z
@@ -106,6 +106,8 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
 
     private void rotY(double value) {
         double[] rot = this.getElementRotation();
+        if (rot == null) return;
+
         this.setElementRotation(rot[0], value, rot[2]);
         quaternion.set(QUtil.ToQuaternion(
                 Math.toRadians(rot[2]), // z
@@ -117,6 +119,8 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
 
     private void rotZ(double value) {
         double[] rot = this.getElementRotation();
+        if (rot == null) return;
+
         this.setElementRotation(rot[0], rot[1], value);
         quaternion.set(QUtil.ToQuaternion(
                 Math.toRadians(value),  // z <-
@@ -137,7 +141,7 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
     }
 
     // rotation to quat sliders
-    private void updateQuatSliders() {
+    protected void updateQuatSliders() {
         this.qx.setValue(quaternion.getX());
         this.qy.setValue(quaternion.getY());
         this.qz.setValue(quaternion.getZ());
@@ -145,17 +149,19 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
     }
 
     // rotation to xyz sliders
-    private void updateEulerSliders() {
-        double[] rot = getElementRotation();
+    protected void updateEulerSliders() {
+        double[] rot = this.getElementRotation();
+        if (rot == null) return;
+
         this.x.setValue(rot[0]);
         this.y.setValue(rot[1]);
         this.z.setValue(rot[2]);
+        updateQuatSliders();
     }
 
     @Override
     public void updateValues(JComponent byGuiElem) {
-        double[] elem = this.getElementRotation();
-        if (elem != null) {
+        if (this.getElementRotation() != null) {
             this.x.setEnabled(true);
             this.y.setEnabled(true);
             this.z.setEnabled(true);
@@ -165,7 +171,6 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
             this.qz.setEnabled(true);
             this.qw.setEnabled(true);
 
-            updateQuatSliders();
             updateEulerSliders();
         } else {
             this.x.setEnabled(false);

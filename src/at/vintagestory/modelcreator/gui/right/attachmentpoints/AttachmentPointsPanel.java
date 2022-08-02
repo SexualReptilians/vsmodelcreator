@@ -1,28 +1,16 @@
 package at.vintagestory.modelcreator.gui.right.attachmentpoints;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.SpringLayout;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 {
@@ -148,7 +136,6 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		posPanel = new AttachmentPointPosPanel();
 		
 		rotPanel = new AttachmentPointRotPanel();
-		rotPanel.setPreferredSize(new Dimension(195, 190));
 	}
 	
 
@@ -159,6 +146,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		layout.putConstraint(SpringLayout.NORTH, codeField, 140, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, posPanel, 190, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, rotPanel, 310, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, rotPanel, -15, SpringLayout.WEST, this);
 	}
 	
 	public void addComponents()
