@@ -2,19 +2,20 @@ package at.vintagestory.modelcreator.gui;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.util.AwtUtil;
-import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
 import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.function.Consumer;
 
 public class LabeledSliderComponent extends JPanel {
 
-    final private DecimalFormat decimalFormat = new DecimalFormat("0.0");
+    final private DecimalFormat decimalFormat;
 
     final private SpringLayout layout;
     final private JPanel panel;
@@ -59,6 +60,11 @@ public class LabeledSliderComponent extends JPanel {
         this.rangeMax = rangeMax * this.multiplier;
         this.posDefault = posDefault * this.multiplier;
         this.tickSpacing = (int)(tickSpacing * this.multiplier);
+        if (Math.abs(rangeMin) < 100 && Math.abs(rangeMax) < 100) {
+            this.decimalFormat = new DecimalFormat("0.00");
+        } else {
+            this.decimalFormat = new DecimalFormat("0.0");
+        }
 
         // Setup panel
         this.layout = new SpringLayout();
@@ -160,7 +166,7 @@ public class LabeledSliderComponent extends JPanel {
         if (!this.isEnabled()) return;
 
         // Multiplier for holding shift
-        float size = e.getWheelRotation() * ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+        float size = e.getWheelRotation() * ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f) / (this.multiplier / 10f);
         this.setValue(this.value + size, true);
     }
 
