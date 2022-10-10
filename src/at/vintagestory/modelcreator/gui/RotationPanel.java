@@ -96,11 +96,7 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
         if (rot == null) return;
 
         this.setElementRotation(value, rot[1], rot[2]);
-        quaternion.set(QUtil.ToQuaternion(
-                Math.toRadians(rot[2]), // z
-                Math.toRadians(rot[1]), // y
-                Math.toRadians(value)   // x <-
-        ));
+        setQuatFromEuler(rot[2], rot[1], value);
         updateQuatSliders();
     }
 
@@ -109,11 +105,7 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
         if (rot == null) return;
 
         this.setElementRotation(rot[0], value, rot[2]);
-        quaternion.set(QUtil.ToQuaternion(
-                Math.toRadians(rot[2]), // z
-                Math.toRadians(value),  // y <-
-                Math.toRadians(rot[0])  // x
-        ));
+        setQuatFromEuler(rot[2], value, rot[0]);
         updateQuatSliders();
     }
 
@@ -122,12 +114,17 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
         if (rot == null) return;
 
         this.setElementRotation(rot[0], rot[1], value);
-        quaternion.set(QUtil.ToQuaternion(
-                Math.toRadians(value),  // z <-
-                Math.toRadians(rot[1]), // y
-                Math.toRadians(rot[0])  // x
-        ));
+        setQuatFromEuler(value, rot[1], rot[0]);
         updateQuatSliders();
+    }
+
+    // store quaternion from zyx
+    private void setQuatFromEuler(double yaw, double pitch, double roll) {
+        quaternion.set(QUtil.ToQuaternion(
+                Math.toRadians(yaw),    // z
+                Math.toRadians(pitch),  // y
+                Math.toRadians(roll)    // x
+        ));
     }
 
     // quat slider values to cube rotation
@@ -161,7 +158,8 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
 
     @Override
     public void updateValues(JComponent byGuiElem) {
-        if (this.getElementRotation() != null) {
+        double[] rot = this.getElementRotation();
+        if (rot != null) {
             this.x.setEnabled(true);
             this.y.setEnabled(true);
             this.z.setEnabled(true);
@@ -171,6 +169,7 @@ public abstract class RotationPanel extends JPanel implements IValueUpdater {
             this.qz.setEnabled(true);
             this.qw.setEnabled(true);
 
+            setQuatFromEuler(rot[2], rot[1], rot[0]);
             updateEulerSliders();
         } else {
             this.x.setEnabled(false);
